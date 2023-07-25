@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+
+{% block home %}
+is-active
+{% endblock %}
+
+
+{% block pagetitle %}
+Home
+{% endblock %}
+
+{% block main %}
+
+
+
+
+<div class="columns">
+
+  <div class="column is-8">
+    <div class="card is-shadowless">
+      <h1 class="subtitle">Schedule</h1>
+      <div class="content">
+        <table class="table is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Slot 1</th>
+              <th>Slot 2</th>
+              <th>Slot 3</th>
+              <th>Slot 4</th>
+              <th>Slot 5</th>
+              <th>Slot 6</th>
+              <th>Slot 7</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in schedule %}
+            <tr>
+
+
+              {% for j in i %}
+              {% if j.1 > 4 %}
+              <td>
+                <span class="tag is-danger is-light">{{j.0}}</span>
+              </td>
+              {% elif j.1 > 2 %}
+
+              <td>
+                <span class="tag is-warning is-light">{{j.0}}</span>
+              </td>
+              {% else %}
+
+
+              <td>
+                <span class="tag is-success is-light">{{j.0}}</span>
+              </td>
+              {% endif %}
+              {% endfor %}
+
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- <div class="column is-8">
+        <div class="card is-shadowless">
+            <h1 class="subtitle">Todo </h1>
+            <div class="content">
+                <ul class="block-list is-small is-left">
+
+                    <li class="is-highlighted ">
+                        <label for="Item1" class="checkbox">
+                            <input type="checkbox" name="Item1" id="">
+                            Item one
+                        </label>
+                    </li>
+                    <li class="is-highlighted ">
+                        <label for="Item1" class="checkbox">
+                            <input type="checkbox" name="Item1" id="">
+                            Item one
+                        </label>
+                    </li>
+                    <li class="is-highlighted ">
+                        <label for="Item1" class="checkbox">
+                            <input type="checkbox" name="Item1" id="">
+                            Item one
+                        </label>
+                    </li>
+                    <li class="is-highlighted ">
+                        <label for="Item1" class="checkbox">
+                            <input type="checkbox" name="Item1" id="">
+                            Item one
+                        </label>
+                    </li>
+                    <li class="is-highlighted ">
+                        <label for="Item1" class="checkbox">
+                            <input type="checkbox" name="Item1" id="">
+                            Item one
+                        </label>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </div> -->
+  <div class="column is-4">
+
+    <div class="card is-shadowless">
+      <h1 class="subtitle">Today</h1>
+      <div class="content">
+        <ul class="block-list is-dark is-small is-left">
+
+          {% for j in schedule %}
+
+          <li class="is-highlighted ">
+
+              {% if j[day].1 > 4 %}
+              <td>
+                <span class="tag is-danger is-light">{{j[day].0}}</span>
+              </td>
+              {% elif j[day].1 > 2 %}
+
+              <td>
+                <span class="tag is-warning is-light">{{j[day].0}}</span>
+              </td>
+              {% else %}
+
+
+              <td>
+                <span class="tag is-success is-light">{{j[day].0}}</span>
+              </td>
+              {% endif %}
+
+</li>
+              {% endfor %}
+
+        </ul>
+
+        <br>
+      </div>
+    </div>
+    <nav class="level is-mobile">
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">CGPA</p>
+          <p class="title">{{cgpa }}</p>
+        </div>
+      </div>
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">SGPA</p>
+          <p class="title">{{sgpa }}</p>
+        </div>
+      </div>
+    </nav>
+  </div>
+</div>
+<div class="container">
+  <div class="card is-shadowless">
+
+    <h1 class="subtitle">Current Semester</h1>
+
+    <div class="columns">
+
+      {% for i in courses %}
+      <div class="column is-3 is-fullheight">
+        <div class="card is-fullheight" style="border-left:5px solid black; height: 100%;">
+          <div class="card-content is-fullheight">
+
+            <h4 class="subtitle has-text-weight-semibold is-size-6">
+              {{ i.1}}
+            </h4>
+            <p>{{i.9}} - {{i.2}} credits</p>
+            <p>{{i.3}}</p>
+          </div>
+
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
