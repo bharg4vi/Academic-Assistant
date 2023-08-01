@@ -4,17 +4,28 @@ from flaskext.mysql import MySQL
 import datetime
 import json
 
+import os
+import pyodbc
+from flask import Flask
 
-app = Flask("GPA Calculator")
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
-app.config['MYSQL_DATABASE_DB'] = 'gpa'
+app = Flask(__name__)
 
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.secret_key = b'3224236aebaa0d19499e54a3ab4d71c323d7a3d5170e8d6fdadd18bcfbf10ba6'
 
-mysql = MySQL()
-mysql.init_app(app)
-conn = mysql.connect()
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
+
+# Get the environment variables for SQL Server connection
+db_host = os.environ['DB_HOST']
+db_name = os.environ['DB_NAME']
+
+# Define the connection string for SQL Server with Trusted Connection
+connection_string = f"DRIVER={{SQL Server}};SERVER={db_host};DATABASE={db_name};Trusted_Connection=yes;"
+
+# Establish the database connection
+conn = pyodbc.connect(connection_string)
+
 
 def greet():
     current_time = datetime.datetime.now().time()
@@ -95,10 +106,9 @@ def calculatecGPA():
     sql = "SELECT * FROM courses where username = '{}'".format(username)
 
 
-    conn = mysql.connect()
+    conn = pyodbc.connect(connection_string)
 
     cursor = conn.cursor()
-    conn.ping(reconnect=True)
     cursor.execute(sql)
     data = cursor.fetchall()
 
@@ -117,8 +127,6 @@ def calculatecGPA():
 
     cursor = conn.cursor()
     sql = "SELECT * FROM old_course where username = '{}'".format(username)
-
-    conn.ping(reconnect=True)
     cursor.execute(sql)
     data = cursor.fetchall()
     for i in data:
@@ -138,9 +146,8 @@ def calculateGPA():
     sql = "SELECT * FROM courses where username = '{}'".format(username)
 
 
-    conn = mysql.connect()
+    conn = pyodbc.connect(connection_string)
     cursor = conn.cursor()
-    conn.ping(reconnect=True)
     cursor.execute(sql)
     data = cursor.fetchall()
 
@@ -198,16 +205,20 @@ def logout():
 def loginuser():
     username = request.form['email']
     password = request.form['pass']
+    print(username)
+    print(password)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE email=%s AND password=%s", (username, password))
+    cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (username, password))
     user = cursor.fetchone()
     if user:
+        print("AYA RE usEr")
         session['username'] = username
         session['name'] = user[1]
         session['currentsem'] = user[10]
 
         print(user[10])
-        return redirect(url_for('mainapp'))
+        print(session)
+        return redirect(url_for('home'))
     else:
         return render_template('login.html', error="Invalid username or password")
 
@@ -329,7 +340,6 @@ def viewsemester():
     cursor.execute(sql)
     courses = cursor.fetchall()
 
-
     return render_template('semview.html', sgpa=calculateGPA(), cgpa=calculatecGPA(), sem = s, courses = courses, semname=request.args.get('semname'), title="Home", session=session)
         
 def calculateLevel(snr, frnd, own):
@@ -366,6 +376,7 @@ def viewcourses():
         datas[i][4][temp] = level
         
     print(type(data))
+    print(datas)
 
     return render_template('courseview.html', title="Home", session=session, data=datas, semester=request.args.get('semester'), marks=marks)
 
@@ -406,7 +417,7 @@ def createSemester():
     cursor = conn.cursor()
     cursor.execute(sql)
 
-    sql = "update users set currentsem = '{}' where username = '{}'".format(semname, session['username'])
+    sql = "update users set currentsem = '{}' where email = '{}'".format(semname, session['username'])
 
     cursor = conn.cursor()
     cursor.execute(sql)
@@ -467,6 +478,7 @@ def createCourse():
 @app.route('/login')
 def login():
     return render_template('login.html', title="Login")
+
 
 @app.route('/signup')
 def signup():
@@ -549,8 +561,12 @@ from datetime import datetime
 def home():
     print("SD",session['currentsem'])
 
-    if not check_session() or len(session["currentsem"]) == 0:
+    if not check_session() :
         return redirect('/login')
+    
+    if session["currentsem"] is None or len(session["currentsem"]) == 0:
+        return redirect('/semester/create')
+
 
     cursor = conn.cursor()
     sql = "select * from courses where username = '{}' and semester = '{}'".format(session['username'], session['currentsem'])
@@ -645,5 +661,5 @@ def goalsCreate():
 
 app.jinja_env.globals.update(abbreviate_sentence = abbreviate_sentence)
 if __name__ == '__main__':
-    app.run( debug=True)    
+    app.run(port=5000, debug=True)
 

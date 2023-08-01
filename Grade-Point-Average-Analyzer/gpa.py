@@ -67,13 +67,14 @@ class Analyzer:
             elif totalmarks > 50:
                 return 'AB'
             elif totalmarks > 40:
+                pass
 
 
-            pass
+          
         elif self.generosity == 2:
+            pass
 
 
-        pass
 
     def plot_grades(self):
         # plots the grades of each subject
