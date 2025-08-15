@@ -10,7 +10,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
-app.secret_key = b'3224236aebaa0d19499e54a3ab4d71c323d7a3d5170e8d6fdadd18bcfbf10ba6'
+app.secret_key = b''
 
 # Load environment variables from .env file
 from dotenv import load_dotenv
